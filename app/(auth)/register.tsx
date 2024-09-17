@@ -1,14 +1,71 @@
-// app/register.tsx
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
+import constants from '@/constants/constants.json';
 
 const Register = () => {
+  const API_URL = constants.API_URI + '/api/Users/Register';
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [password_repeat, setPassword_repeat] = useState('');
   const router = useRouter();
+
+  const handleRegister = async () => {
+    if (username && password && password_repeat) {
+      if (password !== password_repeat) {
+        Alert.alert('Error', 'Passwords do not match.');
+        return;
+      }
+      try {
+        const response = await axios.post(API_URL, { name: username, password: password, passwordRepeat: password_repeat }, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        console.log(response.status);
+        if (response.status === 201) {
+          Alert.alert('Registration Successful');
+          router.push('/login');
+        } else {
+          Alert.alert('Registration Failed', 'Please try again.');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'An error occurred. Please try again.');
+        console.error(error);
+      }
+    } else {
+      Alert.alert('Error', 'Please fill in all fields.');
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text>Register Screen</Text>
+      <Text style={styles.title}>Register</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        placeholderTextColor='gray'
+        value={username}
+        onChangeText={setUsername}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="gray"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Repeat Password"
+        placeholderTextColor="gray"
+        secureTextEntry
+        value={password_repeat}
+        onChangeText={setPassword_repeat}
+      />
+      <Button title="Register" onPress={handleRegister} />
+      <Text>Already have an account?</Text>
+      <Button title="Login" onPress={() => router.push('/login')} />
     </View>
   );
 };
@@ -16,9 +73,20 @@ const Register = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
     justifyContent: 'center',
-    alignItems: 'center',
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
   },
 });
 
