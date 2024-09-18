@@ -16,9 +16,6 @@ const Login = () => {
       // Oblicz hash hasła bezpośrednio przed wysłaniem żądania
       const hashedPassword = CryptoJS.SHA1(password).toString(CryptoJS.enc.Hex);
   
-      console.log(password);
-      console.log(hashedPassword);
-  
       try {
         const response = await axios.post(API_URL, { name: username, password: hashedPassword }, {
           headers: { 'Content-Type': 'application/json' },

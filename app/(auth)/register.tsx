@@ -3,25 +3,40 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import constants from '@/constants/constants.json';
+import CryptoJS from 'crypto-js';
 
 const Register = () => {
   const API_URL = constants.API_URI + '/api/Users/Register';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password_repeat, setPassword_repeat] = useState('');
+  const [email, setEmail] = useState('');
   const router = useRouter();
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleRegister = async () => {
-    if (username && password && password_repeat) {
+    if (username && password && password_repeat && email) {
       if (password !== password_repeat) {
         Alert.alert('Error', 'Passwords do not match.');
         return;
       }
+      if (!validateEmail(email)) {
+        Alert.alert('Error', 'Invalid email address.');
+        return;
+      } 
+
+      const hashedPassword = CryptoJS.SHA1(password).toString(CryptoJS.enc.Hex);
+      const hashedPasswordRepead = CryptoJS.SHA1(password_repeat).toString(CryptoJS.enc.Hex);
       try {
-        const response = await axios.post(API_URL, { name: username, password: password, passwordRepeat: password_repeat }, {
+
+        const response = await axios.post(API_URL, { name: username, password: hashedPassword, passwordRepeat: hashedPasswordRepead, email: email }, {
           headers: { 'Content-Type': 'application/json' },
         });
-        console.log(response.status);
+      
         if (response.status === 201) {
           Alert.alert('Registration Successful');
           router.push('/login');
@@ -62,6 +77,13 @@ const Register = () => {
         secureTextEntry
         value={password_repeat}
         onChangeText={setPassword_repeat}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="gray"
+        value={email}
+        onChangeText={setEmail}
       />
       <Button title="Register" onPress={handleRegister} />
       <Text>Already have an account?</Text>
