@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Button, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import constants from '@/constants/constants.json';
@@ -9,11 +9,11 @@ import USER_ICON from '@/images/user_icon.png';
 
 interface Pin {
   id: string;
-  userId: string;
-  longitude: number;
+  longitude: string;
   latitude: number;
-  postyTypeId: string;
-  categoryId: string;
+  userName: number;
+  postType: string;
+  category: string;
   title: string;
   description: string;
   likesUp: number;
@@ -31,13 +31,18 @@ const Main = () => {
   const router = useRouter();
 
   useEffect(() => {
-    fetchPins();
-    fetchPinTypes();
+    fetchPinTypes(); // Fetch all types on component load
   }, []);
 
-  const fetchPins = async () => {
+  useEffect(() => {
+    if (pinType) {
+      fetchPinsByType(pinType); // Fetch pins by selected type
+    }
+  }, [pinType]);
+
+  const fetchPinsByType = async (selectedType: string) => {
     try {
-      const response = await axios.get(API_URI_POSTS);
+      const response = await axios.get(`${API_URI_POSTS}?postType=${selectedType}`); // Example API endpoint
       setPins(response.data);
     } catch (error) {
       console.error('Error fetching pins:', error);
@@ -55,6 +60,11 @@ const Main = () => {
     } catch (error) {
       console.error('Error fetching pin types:', error);
     }
+  };
+
+  const handleDetailsPress = (selectedPin: Pin) => {
+    // Przekazujemy wybrany pin do Details
+    router.push(`/(main)/Details?id=${selectedPin.id}`);
   };
 
   return (
@@ -75,15 +85,14 @@ const Main = () => {
             title={pin.title}
             description={pin.description}
           >
-            {pin.zdjecia && (
-              <View style={styles.imageContainer}>
-                <Image
-                  style={styles.image}
-                  source={{ uri: `data:image/jpeg;base64,${pin.zdjecia}` }}
-                />
-                <Text>{pin.title}</Text>
+            <Callout>
+              <View style={styles.calloutContainer}>
+                <Text style={styles.calloutTitle}>{pin.title}</Text>
+                <Text>Likes Up: {pin.likesUp}</Text>
+                <Text>Likes Down: {pin.likesDown}</Text>
+                <Button title="Details" onPress={() => handleDetailsPress(pin)} />
               </View>
-            )}
+            </Callout>
           </Marker>
         ))}
       </MapView>
@@ -98,7 +107,7 @@ const Main = () => {
           style={styles.dropdown}
           placeholder="Select Type"
           containerStyle={{ width: 150, height: 40 }}
-          onChangeValue={value => {
+          onChangeValue={(value) => {
             setPinType(value);
           }}
         />
@@ -113,7 +122,8 @@ const Main = () => {
 
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => router.push('/add')}>
+        onPress={() => router.push('/add')}
+      >
         <Text style={styles.addButtonText}>Add Konfiture</Text>
       </TouchableOpacity>
     </View>
@@ -121,12 +131,8 @@ const Main = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  map: { flex: 1 },
   topBar: {
     position: 'absolute',
     top: 10,
@@ -134,43 +140,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  dropdown: {
-    width: 150,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+  dropdown: { width: 150, backgroundColor: '#fff', borderRadius: 5 },
   addButton: {
     position: 'absolute',
     backgroundColor: '#007bff',
     borderRadius: 5,
-    textAlign: 'center',
     margin: 15,
     padding: 15,
     bottom: 20,
     left: '20%',
     right: '20%',
-    paddingHorizontal: 10,
   },
-  iconImage: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-  },
-  settingsIcon: {
-    padding: 10,
-  },
-  imageContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: 100,
-    height: 100,
-  },
+  addButtonText: { color: '#fff', fontSize: 16 },
+  settingsIcon: { padding: 10 },
+  iconImage: { width: 50, height: 50, resizeMode: 'contain' },
+  calloutContainer: { width: 200, padding: 5 },
+  calloutTitle: { fontWeight: 'bold' },
 });
 
 export default Main;

@@ -71,7 +71,7 @@ const Settings = () => {
   const handleApplyChanges = async () => {
     try {
       // Wysłanie zmienionych danych do API
-      const response = await axios.post(API_URI_APPLY_CHANGES, {
+      const response = await axios.put(API_URI_APPLY_CHANGES, {
         sms: sms.toString(),
         emailOption: emailOption.toString(),
         locationBased: locationBased.toString(),
