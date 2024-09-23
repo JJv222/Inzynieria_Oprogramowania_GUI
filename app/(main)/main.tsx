@@ -21,12 +21,7 @@ interface Pin {
   zdjecia: string;  // base64 encoded image
 }
 
-interface PinType {
-  id: string;
-  type: string;
-}
-
-const main = () => {
+const Main = () => {
   const API_URI_POST_TYPES = constants.API_URI + '/api/PostType';
   const API_URI_POSTS = constants.API_URI + '/api/Pin';
   const [pins, setPins] = useState<Pin[]>([]);
@@ -52,7 +47,10 @@ const main = () => {
   const fetchPinTypes = async () => {
     try {
       const response = await axios.get(API_URI_POST_TYPES);
-      const formattedTypes = response.data.map((type: PinType) => ({ label: type.type, value: type.type }));
+      const formattedTypes = response.data.map((type: string) => ({
+        label: type,
+        value: type,
+      }));
       setPinTypes(formattedTypes);
     } catch (error) {
       console.error('Error fetching pin types:', error);
@@ -101,22 +99,22 @@ const main = () => {
           placeholder="Select Type"
           containerStyle={{ width: 150, height: 40 }}
           onChangeValue={value => {
-            setPinType(value); // Ustawia wybraną wartość
+            setPinType(value);
           }}
         />
 
         <TouchableOpacity
           style={styles.settingsIcon}
-          onPress={() => router.push('/settings')}
+          onPress={() => router.push('(user_account)/user_profile')}
         >
           <Image source={USER_ICON} style={styles.iconImage} />
         </TouchableOpacity>
       </View>
 
-       <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push('/add')}>
-      <Text style={styles.addButtonText}>Add Konfiture</Text>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => router.push('/add')}>
+        <Text style={styles.addButtonText}>Add Konfiture</Text>
       </TouchableOpacity>
     </View>
   );
@@ -132,7 +130,7 @@ const styles = StyleSheet.create({
   topBar: {
     position: 'absolute',
     top: 10,
-    right: 10,
+    right: '20%',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -144,14 +142,13 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#fff',
     fontSize: 16,
-  }
-  ,
+  },
   addButton: {
     position: 'absolute',
     backgroundColor: '#007bff',
     borderRadius: 5,
     textAlign: 'center',
-    margin:15,
+    margin: 15,
     padding: 15,
     bottom: 20,
     left: '20%',
@@ -176,4 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default main;
+export default Main;

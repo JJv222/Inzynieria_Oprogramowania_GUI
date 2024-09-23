@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import constants from '@/constants/constants.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CryptoJS from 'crypto-js';
 
 const Login = () => {
@@ -13,15 +14,16 @@ const Login = () => {
 
   const handleLogin = async () => {
     if (username && password) {
-      // Oblicz hash hasła bezpośrednio przed wysłaniem żądania
       const hashedPassword = CryptoJS.SHA1(password).toString(CryptoJS.enc.Hex);
-  
+
       try {
-        const response = await axios.post(API_URL, { name: username, password: hashedPassword }, {
+        const response = await axios.post(API_URL, { username: username, password: hashedPassword }, {
           headers: { 'Content-Type': 'application/json' },
         });
-  
+
         if (response.status === 200) {
+          // Zapisanie nazwy użytkownika w AsyncStorage
+          await AsyncStorage.setItem('username', username);
           Alert.alert('Login Successful', `Welcome, ${username}!`);
           router.push('/main');
         } else {
@@ -35,7 +37,6 @@ const Login = () => {
       Alert.alert('Error', 'Please fill in all fields.');
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -56,7 +57,7 @@ const Login = () => {
         onChangeText={setPassword}
       />
       <Button title="Login" onPress={handleLogin} />
-      <Text>Don't have account ??</Text>
+      <Text>Don't have an account?</Text>
       <Button title="Register" onPress={() => router.push('/register')} />
     </View>
   );

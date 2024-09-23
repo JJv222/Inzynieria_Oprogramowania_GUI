@@ -24,7 +24,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 
 # Wstawienie danych, w tym obrazu
 cursor.execute(sql, (
-    1, 1, 16.99787, 52.39999, 1, 2, 
+    1, 18, 16.99787, 52.39999, 1, 2, 
     'Problemy na Malcie', 'Maltanka się popsuła i dalej nie pojedzie więc lipa ogólnie', 
     0, 0, psycopg2.Binary(binary_data)
 ))

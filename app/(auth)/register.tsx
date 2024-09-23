@@ -11,6 +11,9 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [password_repeat, setPassword_repeat] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [surname, setSurname] = useState('');
+  const [name, setName] = useState('');
   const router = useRouter();
 
   const validateEmail = (email: string): boolean => {
@@ -18,8 +21,13 @@ const Register = () => {
     return emailRegex.test(email);
   };
 
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^\+?[0-9]{1,4}?[-.\s]?(\(?\d{1,3}?\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+    return phoneRegex.test(phone);
+  };
+
   const handleRegister = async () => {
-    if (username && password && password_repeat && email) {
+    if (username && password && password_repeat && email && phone && surname && name) {
       if (password !== password_repeat) {
         Alert.alert('Error', 'Passwords do not match.');
         return;
@@ -27,16 +35,29 @@ const Register = () => {
       if (!validateEmail(email)) {
         Alert.alert('Error', 'Invalid email address.');
         return;
-      } 
+      }
+      if (!validatePhone(phone)) {
+        Alert.alert('Error', 'Invalid phone number.');
+        return;
+      }
 
       const hashedPassword = CryptoJS.SHA1(password).toString(CryptoJS.enc.Hex);
-      const hashedPasswordRepead = CryptoJS.SHA1(password_repeat).toString(CryptoJS.enc.Hex);
-      try {
+      const hashedPasswordRepeat = CryptoJS.SHA1(password_repeat).toString(CryptoJS.enc.Hex);
 
-        const response = await axios.post(API_URL, { name: username, password: hashedPassword, passwordRepeat: hashedPasswordRepead, email: email }, {
+      try {
+        const response = await axios.post(API_URL, { 
+          username: username, 
+          name: name,
+          surname: surname, // Poprawione: `surname` zamiast `surename`
+          phoneNumber: phone, // Poprawione: `phoneNumber` zamiast `phone`
+          password: hashedPassword, 
+          passwordRepeat: hashedPasswordRepeat, 
+          email: email
+        }, 
+        {
           headers: { 'Content-Type': 'application/json' },
         });
-      
+
         if (response.status === 201) {
           Alert.alert('Registration Successful');
           router.push('/login');
@@ -55,6 +76,27 @@ const Register = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        placeholderTextColor='gray'
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Surname" // Poprawione placeholder
+        placeholderTextColor='gray'
+        value={surname}
+        onChangeText={setSurname}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Phone"
+        placeholderTextColor='gray'
+        value={phone}
+        onChangeText={setPhone}
+      />
       <TextInput
         style={styles.input}
         placeholder="Username"
