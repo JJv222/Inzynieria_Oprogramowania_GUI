@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, Button, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,6 +37,8 @@ const Details = () => {
     const [pinDetails, setPinDetails] = useState<PinDetails | null>(null);
     const [userVoted, setUserVoted] = useState(false); // Czy użytkownik już głosował
     const [comments, setComments] = useState<Comment[]>([]);  // Stan na komentarze
+    const [loading, setLoading] = useState(true); // Stan ładowania pinDetails
+    const [commentsLoading, setCommentsLoading] = useState(true); // Stan ładowania komentarzy
     const router = useRouter();
     const API_URI_PIN_DETAILS = `${constants.API_URI}/api/Pin/details?postId=${id}`;
     const API_URI_VOTE_POST = `${constants.API_URI}/api/Pin/votePost`;
@@ -62,6 +64,8 @@ const Details = () => {
             setPinDetails(response.data);
         } catch (error) {
             console.error('Error fetching pin details:', error);
+        } finally {
+            setLoading(false); // Ustaw loading na false po zakończeniu
         }
     };
 
@@ -77,6 +81,8 @@ const Details = () => {
             setComments(commentsWithVoteStatus);
         } catch (error) {
             console.error('Error fetching comments:', error);
+        } finally {
+            setCommentsLoading(false); // Ustaw loading na false po zakończeniu
         }
     };
 
@@ -122,8 +128,17 @@ const Details = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
+
     if (!pinDetails) {
-        return <Text>Loading...</Text>;
+        return <Text>No details available.</Text>;
     }
 
     return (
@@ -147,24 +162,22 @@ const Details = () => {
                     </TouchableOpacity>
                 </View>
             </View>
-
+    
             {/* Sekcja komentarzy */}
             <Text style={styles.commentsTitle}>Comments</Text>
-            {comments.length > 0 ? (
+            {commentsLoading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : comments.length > 0 ? (
                 comments.map((comment) => (
                     <View key={comment.id} style={styles.comment}>
                         <Text style={styles.commentUsername}>{comment.username}</Text>
                         <Text style={styles.commentDescription}>{comment.description}</Text>
                         <View style={styles.likesContainer}>
                             <TouchableOpacity onPress={() => voteComment(comment.id, 'likeUp')} disabled={comment.userVoted}>
-                                <Text style={[styles.likeText, comment.userVoted && styles.disabledText]}>
-                                    👍 {comment.likesUp}
-                                </Text>
+                                <Text style={[styles.likeText, comment.userVoted && styles.disabledText]}>👍 {comment.likesUp}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => voteComment(comment.id, 'likeDown')} disabled={comment.userVoted}>
-                                <Text style={[styles.likeText, comment.userVoted && styles.disabledText]}>
-                                    👎 {comment.likesDown}
-                                </Text>
+                                <Text style={[styles.likeText, comment.userVoted && styles.disabledText]}>👎 {comment.likesDown}</Text>
                             </TouchableOpacity>
                         </View>
                         {comment.zdjecia && (
@@ -178,7 +191,10 @@ const Details = () => {
             ) : (
                 <Text style={styles.noCommentsText}>No comments yet. Be the first to comment!</Text>
             )}
-
+    
+            {/* Dodany przycisk do dodawania komentarzy */}
+            <Button title="Add Comment" onPress={() => router.push(`/addPage?id=${id}`)} />
+    
             <Button title="Back" onPress={() => router.back()} />
         </ScrollView>
     );
@@ -189,6 +205,11 @@ const styles = StyleSheet.create({
         flex: 1, 
         padding: 20, 
         backgroundColor: '#f9f9f9' 
+    },
+    loadingContainer: { 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center' 
     },
     disabledText: { 
         color: '#ccc' 
@@ -201,17 +222,17 @@ const styles = StyleSheet.create({
         shadowColor: '#000', 
         shadowOpacity: 0.1, 
         shadowRadius: 5, 
-        elevation: 2 
+        elevation: 1 
     },
     title: { 
-        fontSize: 26, 
+        fontSize: 24, 
         fontWeight: 'bold', 
         color: '#333', 
         marginBottom: 10 
     },
     author: { 
         fontSize: 16, 
-        color: '#888', 
+        color: '#777', 
         marginBottom: 10 
     },
     description: { 

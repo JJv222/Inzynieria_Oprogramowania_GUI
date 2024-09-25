@@ -19,6 +19,7 @@ interface Pin {
   likesUp: number;
   likesDown: number;
   zdjecia: string;  // base64 encoded image
+  reputation: number;
 }
 
 const Main = () => {
@@ -84,12 +85,14 @@ const Main = () => {
             coordinate={{ latitude: pin.latitude, longitude: pin.longitude }}
             title={pin.title}
             description={pin.description}
+            reputation={pin.reputation}
           >
             <Callout>
               <View style={styles.calloutContainer}>
                 <Text style={styles.calloutTitle}>{pin.title}</Text>
                 <Text>Likes Up: {pin.likesUp}</Text>
                 <Text>Likes Down: {pin.likesDown}</Text>
+                <Text>User Reputation: {pin.reputation}</Text>
                 <Button title="Details" onPress={() => handleDetailsPress(pin)} />
               </View>
             </Callout>
