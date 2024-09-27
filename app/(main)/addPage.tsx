@@ -7,27 +7,14 @@ import axios from 'axios';
 import constants from '@/constants/constants.json';
 
 const AddCommentPage = () => {
-    const { id } = useLocalSearchParams();  // Pobranie ID posta z parametrów URL
+    const { id, username } = useLocalSearchParams();  // Pobranie ID posta z parametrów URL
     const [comment, setComment] = useState('');
-    const [username, setUsername] = useState('');
     const [image, setImage] = useState<string | null>(null);  // Przechowywanie wybranego zdjęcia
     const [charCount, setCharCount] = useState(0);  // Przechowywanie liczby liter (znaków)
     const router = useRouter();
     const charLimit = 150;
 
     const API_URI_ADD_COMMENT = `${constants.API_URI}/api/Comment`;
-
-    // Załaduj nazwę użytkownika z AsyncStorage
-    const loadUsername = async () => {
-        const storedUsername = await AsyncStorage.getItem('username');
-        if (storedUsername) {
-            setUsername(storedUsername);
-        }
-    };
-
-    useEffect(() => {
-        loadUsername();
-    }, []);
 
     // Funkcja do wybierania obrazu
     const pickImage = async () => {

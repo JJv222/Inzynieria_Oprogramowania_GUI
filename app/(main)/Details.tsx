@@ -33,7 +33,7 @@ interface Comment {
 
 const Details = () => {
     const [userName, setUserName] = useState<string | null>(null);
-    const { id } = useLocalSearchParams(); // Get the pin ID from URL params
+    const { id,username } = useLocalSearchParams(); // Get the pin ID from URL params
     const [pinDetails, setPinDetails] = useState<PinDetails | null>(null);
     const [userVoted, setUserVoted] = useState(false); // Czy użytkownik już głosował
     const [comments, setComments] = useState<Comment[]>([]);  // Stan na komentarze
@@ -193,7 +193,7 @@ const Details = () => {
             )}
     
             {/* Dodany przycisk do dodawania komentarzy */}
-            <Button title="Add Comment" onPress={() => router.push(`/addPage?id=${id}`)} />
+            <Button title="Add Comment" onPress={() => router.push(`/addPage?id=${id}&username=${username}`)} />
     
             <Button title="Back" onPress={() => router.back()} />
         </ScrollView>

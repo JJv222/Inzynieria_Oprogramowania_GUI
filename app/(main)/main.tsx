@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Button, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import axios from 'axios';
 import constants from '@/constants/constants.json';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -28,6 +28,7 @@ const Main = () => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [pinType, setPinType] = useState<string | null>(null);
   const [pinTypes, setPinTypes] = useState<{ label: string; value: string }[]>([]);
+  const { username } = useLocalSearchParams();
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -42,6 +43,8 @@ const Main = () => {
   }, [pinType]);
 
   const fetchPinsByType = async (selectedType: string) => {
+
+    console.log("siema",selectedType, username);
     try {
       const response = await axios.get(`${API_URI_POSTS}?postType=${selectedType}`); // Example API endpoint
       setPins(response.data);
@@ -65,7 +68,7 @@ const Main = () => {
 
   const handleDetailsPress = (selectedPin: Pin) => {
     // Przekazujemy wybrany pin do Details
-    router.push(`/(main)/Details?id=${selectedPin.id}`);
+    router.push(`/(main)/Details?id=${selectedPin.id}&username=${username}`);
   };
 
   return (
@@ -77,6 +80,11 @@ const Main = () => {
           longitude: 16.9252,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
+        }}
+        onLongPress={(e) => {
+          const { latitude, longitude } = e.nativeEvent.coordinate;
+          console.log(pinType);
+          router.push(`/addPin?username=${username}&latitude=${latitude}&longitude=${longitude}&postType=${pinType}`);
         }}
       >
         {pins.map((pin) => (

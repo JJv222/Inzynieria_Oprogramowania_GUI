@@ -25,7 +25,7 @@ const Login = () => {
           // Zapisanie nazwy użytkownika w AsyncStorage
           await AsyncStorage.setItem('username', username);
           Alert.alert('Login Successful', `Welcome, ${username}!`);
-          router.push('/main');
+          router.push(`/main?username=${username}`);
         } else {
           Alert.alert('Login Failed', 'Please try again.');
         }
