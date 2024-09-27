@@ -18,7 +18,6 @@ interface Pin {
   description: string;
   likesUp: number;
   likesDown: number;
-  zdjecia: string;  // base64 encoded image
   reputation: number;
 }
 

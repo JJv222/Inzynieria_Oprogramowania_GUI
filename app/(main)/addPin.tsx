@@ -76,31 +76,30 @@ const AddPin = () => {
             Alert.alert('Error', 'Please fill all fields');
             return;
         }
-
+            console.log("longitude: " + longitude + " latitude: " + latitude);
         //setLoading(true);
-      
+        const API_URI_ADD_COMMENT = `${constants.API_URI}/api/Comment`;
+    // Konwersja longitude i latitude na string w razie potrzeby
+    const longitudeStr: string = Array.isArray(longitude) ? longitude[0] : String(longitude);
+    const latitudeStr: string = Array.isArray(latitude) ? latitude[0] : String(latitude);
+
+    // Ucinanie stringów do 10 znaków
+    const cutString: string = longitudeStr.slice(0, 10);
+    const cutString2: string = latitudeStr.slice(0, 10);
         try {
-            const res = '"'+ image + '"';
-            console.log(res);
-            await axios.post(API_URI_ADD_PIN, 
-                {
-                    res // Wysłanie obrazu w ciele zapytania
-                }, 
-                {
-                    headers: {
-                        'title': title,
-                        'description': description,
-                        'category': category,
-                        'postType': postType,
-                        'username': username,
-                        'longitude': longitude,  // Wysyłane jako liczba
-                        'latitude': latitude,  // Wysyłane jako liczba
-                    },
-                }
-            );
+            await axios.post(API_URI_ADD_PIN, {
+                title: title,
+                description: description,
+                category: category,
+                postType: postType,
+                userName: username,
+                longitude: longitude,
+                latitude: latitude,
+                zdjecia: image, 
+            });
         //    setLoading(false);
             Alert.alert('Success', 'Pin added successfully');
-            router.push('/main');
+            router.push(`/main?username=${username}`);
         } catch (error) {
             setLoading(false);
             console.error('Error adding pin:', error);
