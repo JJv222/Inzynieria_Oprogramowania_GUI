@@ -76,8 +76,7 @@ const AddPin = () => {
             Alert.alert('Error', 'Please fill all fields');
             return;
         }
-            console.log("longitude: " + longitude + " latitude: " + latitude);
-        //setLoading(true);
+        setLoading(true);
         const API_URI_ADD_COMMENT = `${constants.API_URI}/api/Comment`;
     // Konwersja longitude i latitude na string w razie potrzeby
     const longitudeStr: string = Array.isArray(longitude) ? longitude[0] : String(longitude);

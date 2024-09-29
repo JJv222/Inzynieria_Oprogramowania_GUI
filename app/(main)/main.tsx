@@ -43,7 +43,6 @@ const Main = () => {
 
   const fetchPinsByType = async (selectedType: string) => {
 
-    console.log("siema",selectedType, username);
     try {
       const response = await axios.get(`${API_URI_POSTS}?postType=${selectedType}`); // Example API endpoint
       setPins(response.data);
@@ -82,7 +81,6 @@ const Main = () => {
         }}
         onLongPress={(e) => {
           const { latitude, longitude } = e.nativeEvent.coordinate;
-          console.log(pinType);
           router.push(`/addPin?username=${username}&latitude=${latitude}&longitude=${longitude}&postType=${pinType}`);
         }}
       >
@@ -129,13 +127,6 @@ const Main = () => {
           <Image source={USER_ICON} style={styles.iconImage} />
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => router.push('/add')}
-      >
-        <Text style={styles.addButtonText}>Add Konfiture</Text>
-      </TouchableOpacity>
     </View>
   );
 };

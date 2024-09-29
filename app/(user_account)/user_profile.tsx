@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';  // Dodaj import do ImagePicker
 import USER_ICON from '@/images/user_icon.png';
 import axios from 'axios';
 import constants from '@/constants/constants.json';
@@ -15,6 +16,7 @@ const Settings = () => {
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [reputationPoints, setReputationPoints] = useState<number | null>(null);
+  const [avatar, setAvatar] = useState<any>(USER_ICON);  // Stan dla awatara
 
   // Dodane: Ustawienia powiadomień
   const [sms, setSms] = useState<boolean>(false);
@@ -68,6 +70,26 @@ const Settings = () => {
     }
   };
 
+  // Funkcja do wybierania awatara
+  const handleAddAvatar = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission to access the gallery is required!");
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!pickerResult.canceled) {
+      setAvatar({ uri: pickerResult.uri });
+    }
+  };
+
   const handleApplyChanges = async () => {
     try {
       // Wysłanie zmienionych danych do API
@@ -98,7 +120,7 @@ const Settings = () => {
   return (
     <View style={styles.container}>
       <View style={styles.userInfo}>
-        <Image source={USER_ICON} style={styles.userIcon} />
+        <Image source={avatar} style={styles.userIcon} />
         {username ? (
           <>
             <Text style={styles.usernameText}>Username: {username}</Text>
@@ -112,7 +134,11 @@ const Settings = () => {
         )}
       </View>
 
-      {/* Dodane: Checkboxy dla powiadomień */}
+      {/* Dodany przycisk "Dodaj Avatar" */}
+      <TouchableOpacity style={styles.avatarButton} onPress={handleAddAvatar}>
+        <Text style={styles.avatarButtonText}>Set Your Avatar</Text>
+      </TouchableOpacity>
+
       <View style={styles.optionsContainer}>
         <View style={styles.optionRow}>
           <Text style={styles.optionText}>SMS Notifications</Text>
@@ -220,6 +246,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  avatarButton: {
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  avatarButtonText: {
     color: '#fff',
     fontSize: 16,
   },
