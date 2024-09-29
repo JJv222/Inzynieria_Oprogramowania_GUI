@@ -98,6 +98,7 @@ const Main = () => {
                 <Text>Likes Up: {pin.likesUp}</Text>
                 <Text>Likes Down: {pin.likesDown}</Text>
                 <Text>User Reputation: {pin.reputation}</Text>
+                <Text>UserName: {pin.userName}</Text>
                 <Button title="Details" onPress={() => handleDetailsPress(pin)} />
               </View>
             </Callout>
